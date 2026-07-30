@@ -4,7 +4,6 @@ import streamlit as st
 from google import genai
 from google.genai import types
 
-#  KONFIGURAS
 EMBED_MODEL = "gemini-embedding-001"
 CHAT_MODEL  = "gemini-3.5-flash"
 DIM = 768
@@ -15,8 +14,6 @@ INDEX_PATH = os.path.join(BASE_DIR, "index.npz")
 
 client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
-
-# MUAT INDEKS
 @st.cache_resource(show_spinner="Memuat indeks pengetahuan...")
 def load_index():
     if not os.path.exists(INDEX_PATH):
@@ -24,8 +21,6 @@ def load_index():
     d = np.load(INDEX_PATH, allow_pickle=True)
     return d["mat"], list(d["sources"]), list(d["texts"])
 
-
-# RET
 def _retry(fn, tries=5, wait=10):
     for _ in range(tries):
         try:
@@ -35,10 +30,7 @@ def _retry(fn, tries=5, wait=10):
                 time.sleep(wait)
                 continue
             raise
-    raise RuntimeError("Batas kuota API tercapai. Coba lagi beberapa saat.")
-
-
-# EMBED PERTANYAAN
+    raise RuntimeError("Batas kuota API tercapai. Coba lagi beberapa saat."
 def embed_query(q):
     def call():
         r = client.models.embed_content(
@@ -60,8 +52,6 @@ def retrieve(q, mat, sources, texts, k=TOP_K):
     top = np.argsort(-sims)[:k]
     return [(sources[i], texts[i], float(sims[i])) for i in top]
 
-
-# GENERATION
 def generate_answer(query, contexts):
     blok = "\n\n".join(
         f"[Sumber {n}] ({src})\n{txt}" for n, (src, txt, _) in enumerate(contexts, 1)
@@ -78,8 +68,6 @@ PERTANYAAN: {query}
 JAWABAN:"""
     return _retry(lambda: client.models.generate_content(model=CHAT_MODEL, contents=prompt).text)
 
-
-# UI
 st.title("Governance Knowledge Management System — Demo")
 st.caption("Prototipe RAG. Jawaban selalu merujuk ke dokumen sumber. Hanya dokumen publik.")
 
