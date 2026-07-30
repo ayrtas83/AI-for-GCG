@@ -4,7 +4,7 @@ import streamlit as st
 from google import genai
 from google.genai import types
 
-# ---------- KONFIGURASI (samakan dengan build_embeddings.py) ----------
+# ---------- KONFIGURASI ----------
 EMBED_MODEL = "gemini-embedding-001"
 CHAT_MODEL  = "gemini-3.5-flash"   # model Flash GA saat ini (VERIFIKASI di AI Studio bila 404)
 DIM = 768
@@ -16,7 +16,7 @@ INDEX_PATH = os.path.join(BASE_DIR, "index.npz")
 client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
 
-# ---------- MUAT INDEKS (cek keberadaan di luar cache; cache di-key mtime) ----------
+# ---------- MUAT INDEKS ----------
 @st.cache_resource(show_spinner="Memuat indeks pengetahuan...")
 def _load_index(path, mtime):
     d = np.load(path, allow_pickle=True)
@@ -29,7 +29,7 @@ def load_index():
     return _load_index(INDEX_PATH, os.path.getmtime(INDEX_PATH))
 
 
-# ---------- RETRY untuk error sementara (429 kuota + 503/500 server sibuk) ----------
+# ---------- RETRY untuk error sementara ----------
 def _retry(fn, tries=5):
     transient = ("RESOURCE_EXHAUSTED", "429", "UNAVAILABLE", "503",
                  "500", "INTERNAL", "DEADLINE", "overloaded", "high demand")
@@ -44,7 +44,7 @@ def _retry(fn, tries=5):
     raise RuntimeError("BUSY")  # ditangani di UI dengan pesan ramah
 
 
-# ---------- EMBED PERTANYAAN (hanya 1 request per query) ----------
+# ---------- EMBED PERTANYAAN  ----------
 def embed_query(q):
     def call():
         r = client.models.embed_content(
@@ -67,7 +67,7 @@ def retrieve(q, mat, sources, texts, k=TOP_K):
     return [(sources[i], texts[i], float(sims[i])) for i in top]
 
 
-# ---------- GENERATION ber-grounding + wajib sitasi ----------
+# ---------- GENERATION ----------
 def generate_answer(query, contexts):
     blok = "\n\n".join(
         f"[Sumber {n}] ({src})\n{txt}" for n, (src, txt, _) in enumerate(contexts, 1)
