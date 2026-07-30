@@ -6,7 +6,7 @@ from google.genai import types
 
 # ---------- KONFIGURASI ----------
 EMBED_MODEL = "gemini-embedding-001"
-CHAT_MODEL  = "gemini-2.5-flash"
+CHAT_MODEL  = "gemini-3.5-flash"
 DIM = 768
 TOP_K = 4
 
