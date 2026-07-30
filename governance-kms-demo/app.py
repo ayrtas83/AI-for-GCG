@@ -1,7 +1,7 @@
 import os, glob, time
 import numpy as np
 import streamlit as st
-import google.generativeai as genai
+import google.genai as genai
 from pypdf import PdfReader
 import faiss
 
