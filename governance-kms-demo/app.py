@@ -4,9 +4,9 @@ import streamlit as st
 from google import genai
 from google.genai import types
 
-# ---------- KONFIGURASI (samakan dengan build_embeddings.py) ----------
+# ---------- KONFIGURASI ----------
 EMBED_MODEL = "gemini-embedding-001"
-CHAT_MODEL  = "gemini-2.5-flash"   # pilih model Flash gratis di AI Studio
+CHAT_MODEL  = "gemini-2.5-flash"
 DIM = 768
 TOP_K = 4
 
@@ -16,7 +16,7 @@ INDEX_PATH = os.path.join(BASE_DIR, "index.npz")
 client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
 
-# ---------- MUAT INDEKS PRA-HITUNG (bukan meng-embed korpus di sini) ----------
+# ---------- MUAT INDEKS PRA-HITUNG ----------
 @st.cache_resource(show_spinner="Memuat indeks pengetahuan...")
 def load_index():
     if not os.path.exists(INDEX_PATH):
@@ -38,7 +38,7 @@ def _retry(fn, tries=5, wait=10):
     raise RuntimeError("Batas kuota API tercapai. Coba lagi beberapa saat.")
 
 
-# ---------- EMBED PERTANYAAN (hanya 1 request per query) ----------
+# ---------- EMBED PERTANYAAN ----------
 def embed_query(q):
     def call():
         r = client.models.embed_content(
@@ -61,7 +61,7 @@ def retrieve(q, mat, sources, texts, k=TOP_K):
     return [(sources[i], texts[i], float(sims[i])) for i in top]
 
 
-# ---------- GENERATION ber-grounding + wajib sitasi ----------
+# ---------- GENERATION ----------
 def generate_answer(query, contexts):
     blok = "\n\n".join(
         f"[Sumber {n}] ({src})\n{txt}" for n, (src, txt, _) in enumerate(contexts, 1)
