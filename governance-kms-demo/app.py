@@ -6,7 +6,7 @@ import google.generativeai as genai
 from pypdf import PdfReader
 import faiss
 
----------- KONFIGURASI (VERIFIKASI ID model di AI Studio) ----------
+#---------- KONFIGURASI (VERIFIKASI ID model di AI Studio) ----------
 EMBED_MODEL = "models/text-embedding-004"   # ganti sesuai model embedding terkini
 CHAT_MODEL  = "gemini-1.5-flash"            # ganti sesuai model Flash terkini
 CHUNK_WORDS = 250
