@@ -30,7 +30,7 @@ def _retry(fn, tries=5, wait=10):
                 time.sleep(wait)
                 continue
             raise
-    raise RuntimeError("Batas kuota API tercapai. Coba lagi beberapa saat."
+    raise RuntimeError("Batas kuota API tercapai. Coba lagi beberapa saat.")
 def embed_query(q):
     def call():
         r = client.models.embed_content(
