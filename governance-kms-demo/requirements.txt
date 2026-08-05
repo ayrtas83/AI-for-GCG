@@ -1,2 +1,3 @@
 google-genai
 numpy
+starlette<1.4
