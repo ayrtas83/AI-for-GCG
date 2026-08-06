@@ -4,9 +4,9 @@ import streamlit as st
 from google import genai
 from google.genai import types
 
-# ---------- KONFIGURASI (samakan dengan build_embeddings.py) ----------
+# ---------- KONFIGURASI ----------
 EMBED_MODEL = "gemini-embedding-001"
-CHAT_MODEL  = "gemini-3.5-flash"   # model Flash GA saat ini (VERIFIKASI di AI Studio bila 404)
+CHAT_MODEL  = "gemini-3.5-flash"   # model Flash GA
 DIM = 768
 TOP_K = 4
 
@@ -16,7 +16,7 @@ INDEX_PATH = os.path.join(BASE_DIR, "index.npz")
 client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
 
-# ---------- MUAT INDEKS (cek keberadaan di luar cache; cache di-key mtime) ----------
+# ---------- MUAT INDEKS ----------
 @st.cache_resource(show_spinner="Memuat indeks pengetahuan...")
 def _load_index(path, mtime):
     d = np.load(path, allow_pickle=True)
@@ -29,7 +29,7 @@ def load_index():
     return _load_index(INDEX_PATH, os.path.getmtime(INDEX_PATH))
 
 
-# ---------- RETRY untuk error sementara (429 kuota + 503/500 server sibuk) ----------
+# ---------- RETRY ----------
 def _retry(fn, tries=5):
     transient = ("RESOURCE_EXHAUSTED", "429", "UNAVAILABLE", "503",
                  "500", "INTERNAL", "DEADLINE", "overloaded", "high demand")
@@ -91,7 +91,7 @@ def generate_answer(prompt):
 
 # ---------- UI ----------
 st.title("Governance Knowledge Management System — Demo")
-st.caption("Prototipe RAG. Jawaban selalu merujuk ke dokumen sumber.")
+st.caption("Project Thesis Satrya Ramadhan. Jawaban selalu merujuk ke dokumen sumber.")
 
 mat, sources, texts = load_index()
 if mat is None:
@@ -102,14 +102,14 @@ if mat is None:
     st.stop()
 
 st.caption(f"Indeks siap: {len(texts)} potongan dokumen.")
-show_trace = st.sidebar.checkbox("Tampilkan proses RAG (mode demonstrasi)", value=True)
+show_trace = st.sidebar.checkbox("Tampilkan proses RAG (mode demo)", value=True)
 
 q = st.chat_input("Tanyakan sesuatu tentang GCG, gratifikasi, benturan kepentingan, dst.")
 if q:
     st.chat_message("user").write(q)
     try:
         qvec = embed_query(q)                          # 1. embedding query
-        hits = search(qvec, mat, sources, texts)       # 2. similarity search -> top-k
+        hits = search(qvec, mat, sources, texts)       # 2. similarity search
         prompt = build_prompt(q, hits)                 # 3. prompt
         answer = generate_answer(prompt)               # 4. generation
     except RuntimeError:
@@ -128,7 +128,7 @@ if q:
                 st.write(txt[:400] + ("..." if len(txt) > 400 else ""))
 
         if show_trace:
-            with st.expander("Proses RAG (untuk pembahasan skripsi)", expanded=False):
+            with st.expander("Proses RAG", expanded=False):
                 st.markdown("**1. Pertanyaan**")
                 st.code(q, language=None)
 
